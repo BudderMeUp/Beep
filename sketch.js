@@ -33,8 +33,7 @@ function preload(){
   cloud1 = loadImage('assets/Cloud1.png');
   cloud2 = loadImage('assets/Cloud2.png');
   enemyBG = loadImage('assets/EnemyBG.png');
-  gif = createImg('assets/Ground1.gif');
-  gif.hide();
+  ocean = loadImage('assets/Ocean.png');
   soundFormats('mp3', 'ogg','wav');
   PlayerShoot = loadSound('assets/PlayerShoot.wav');
   PlayerDead = loadSound('assets/PlayerDead.wav');
@@ -96,7 +95,7 @@ function restartGame(){ // R E S T A R T ===================
 }
 function draw(){
   background(0,50,180);
-  image(gif, width/2, height/2, 1200, 900);
+  image(ocean, width/2, height/2, 1200, 900);
   image(enemyBG,enemyBGx,enemyBGy,enemyBGsize,enemyBGsize);//Background enemy
   enemyBGy += 2;
   if (enemyBGy > 920){
@@ -206,8 +205,8 @@ function draw(){
   }
 
   growBomb.y += growBomb.bombSpeed; //grow bomb
-  fill(0,100,250);
-  stroke(40,180,200);
+  fill(210,20,85);
+  stroke(255,0,5);
   strokeWeight(5)
   growBomb.diameter = BombSize
   ellipse(growBomb.x, growBomb.y, growBomb.diameter, growBomb.diameter);
