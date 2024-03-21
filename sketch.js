@@ -142,7 +142,7 @@ function draw(){
     laserY = PlayerY;
   }
   
-  if (Health > 175 && target == true){  // L A S E R ============
+  if (Health > 125 && target == true){  // L A S E R ============
     rect(0,laserY,20,80);
     rect(1180,laserY,20,80);
     
@@ -268,7 +268,7 @@ function draw(){
     if (HitCooldown === false && dist(bullet.x, bullet.y, dropper, 100) < 40) { //Enemy get hit
       console.log("Enemy hit!");
       HitCooldown = true;
-      Health += 4;
+      Health += 2;
       
       EnemyHit.play();
    }
