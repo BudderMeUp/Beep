@@ -4,6 +4,7 @@ let growBomb = [];
 let bullets = [];
 let cloud1Obj = [];
 let cloud2Obj = [];
+let laser = [];
 let numClouds = 10;
 let PlayerX = 800;
 let PlayerY = 400;
@@ -19,6 +20,12 @@ let GameOver = false; //GAME OVER
 let restartDeath = 0;
 let HitCooldown = false;
 let HitTimer = 0;
+let target = true;
+let laserTime = 0;
+let laserY = 890;
+let tracking = true;
+let ChargeSound = false;
+let LaserSound = false;
 function preload(){
   enemy = loadImage('assets/Enemy.png');
   player = loadImage('assets/PlayerJet.png');
@@ -34,6 +41,8 @@ function preload(){
   EnemyHit = loadSound('assets/EnemyHit.wav');
   EnemyShoot = loadSound('assets/EnemyShoot.wav');
   Win = loadSound('assets/Victory.wav');
+  Laser = loadSound('assets/LaserFire.wav');
+  Charge = loadSound('assets/laserCharge.wav');
 }
 
 function setup() {
@@ -49,6 +58,13 @@ function setup() {
   loop = 0;
   bombs = 100;
 
+  laser = {
+    x: -5,
+    y: laserY,
+    width: 20,
+    height: 80
+  };
+  
   for (let i = 0; i < numBombs; i++){ //Red Bomb
     Obombs[i] = {
       x: dropper,
@@ -95,15 +111,7 @@ function draw(){
     enemyBGx = random(50,1150);
     enemyBGsize = random(10,35);
   }
-  textSize(20);
-  fill(0);
-  text("Time: " + time, 20, 40);
-  fill(0,255,0);
-  stroke(40);
-  rect(width/4,20,500,10);
-  fill(255,0,0)
-  rect(width/4,20,Health,10);
-  fill(210,10,10);
+  
   imageMode(CENTER);
   //Cloud 1
   for (let i = 0; i < numClouds; i++){
@@ -127,7 +135,53 @@ function draw(){
       cloud2Obj[i].size = random(100, 150);
       }
     }
-  image(enemy,dropper,enemyY,80,80); //Enemy image
+  textSize(20);
+  fill(0);
+  text("Time: " + time, 20, 40);
+  fill(0,255,0);
+  stroke(40);
+  rect(width/4,20,500,10);
+  fill(255,0,0)
+  rect(width/4,20,Health,10);
+  fill(210,10,10);
+  
+  if (tracking == true){
+    laserY = PlayerY;
+  }
+  
+  if (Health > 50 && target == true){  // L A S E R ============
+    rect(0,laserY,20,80);
+    rect(1180,laserY,20,80);
+    
+    if (laserTime >= 15){
+      tracking = false;
+      if (laserTime >= 17){
+        stroke(255,255,0);
+        strokeWeight(5);
+        rect(-5,laserY,1200,80);
+        console.log("Laser Fired!")
+        if (laserTime > 19){
+          laserTime = 0;
+          tracking = true;
+          ChargeSound = false;
+          LaserSound = false;
+        }
+      }
+    }
+  
+  } else {laserTime = 0;}
+  if (laserTime === 12 && ChargeSound == false){
+    Charge.play();
+    ChargeSound = true;
+    console.log("Charging Laser!")
+  }
+  if (laserTime === 17 && LaserSound == false){
+    Laser.play();
+    LaserSound = true;
+    console.log("Laser Fired!")
+  }
+  
+  image(enemy,dropper,enemyY,80,80); // E N E M Y ****************
   dropper += dropperSpeed;
   if (dropper > 1185 || dropper < 15){
     dropperSpeed *= -1;
@@ -139,8 +193,9 @@ function draw(){
     bombObj.y += bombObj.bombSpeed;
     loop += 1;
     if (loop > 200){
-      time += 1;
+      time += 1;  // T I M E !!!!!!!!!!!!!!!!!
       loop = 0;
+      laserTime += 1;
       dropperSpeed += random(.5,1);
     }
     strokeWeight(2)
@@ -170,7 +225,7 @@ function draw(){
     growBomb.diameter = random(10, 20); 
     growBomb.bombSpeed = random(3, maxSpeed); 
   }
-  for (let i = 0; i < Obombs.length; i++) { //Player Dead BOMBS
+  for (let i = 0; i < Obombs.length; i++) { //Player Dead BOMBS XXXXXXXXXXXXXX
     let bombObj = Obombs[i];
     if (dist(PlayerX, PlayerY, bombObj.x, bombObj.y) < bombObj.diameter / 2 + 20) {
       console.log("Player hit by bomb!");
@@ -184,7 +239,7 @@ function draw(){
       noLoop();
     }
   }
- //Player Dead GROW BOMB
+ //Player Dead GROW BOMB XXXXXXXXXXXXXXXXXXXXXX
   if (dist(PlayerX, PlayerY, growBomb.x, growBomb.y) < growBomb.diameter / 2 + 10) {
       console.log("Player hit by bomb!");
       image(boom,PlayerX,PlayerY,100,100);
@@ -196,7 +251,19 @@ function draw(){
       text("Click 3 Times to Restart ",width/4, height/2);
       noLoop();
     }
-  
+    // Player Dead LASER XXXXXXXXXXXXXXXXXXXXX
+    if ((PlayerX > 0 && PlayerX < 20 && PlayerY > laserY && PlayerY < laserY + 80) ||
+    (PlayerX > 1180 && PlayerX < 1200 && PlayerY > laserY && PlayerY < laserY + 80)) {
+      console.log("Player hit by laser!");
+      image(boom, PlayerX, PlayerY, 100, 100);
+      PlayerDead.play();
+      GameOver = true;
+      textSize(50);
+      stroke(255, 180, 180);
+      fill(200, 40, 40);
+      text("Click 3 Times to Restart ", width / 4, height / 2);
+      noLoop();
+    }
   strokeWeight(0)
   for (let i = bullets.length - 1; i >= 0; i--) { //bullet
     let bullet = bullets[i];
