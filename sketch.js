@@ -4,7 +4,6 @@ let growBomb = [];
 let bullets = [];
 let cloud1Obj = [];
 let cloud2Obj = [];
-let laser = [];
 let numClouds = 10;
 let PlayerX = 800;
 let PlayerY = 400;
@@ -26,6 +25,7 @@ let laserY = 890;
 let tracking = true;
 let ChargeSound = false;
 let LaserSound = false;
+let LaserHit = false;
 function preload(){
   enemy = loadImage('assets/Enemy.png');
   player = loadImage('assets/PlayerJet.png');
@@ -58,13 +58,6 @@ function setup() {
   loop = 0;
   bombs = 100;
 
-  laser = {
-    x: -5,
-    y: laserY,
-    width: 20,
-    height: 80
-  };
-  
   for (let i = 0; i < numBombs; i++){ //Red Bomb
     Obombs[i] = {
       x: dropper,
@@ -149,13 +142,14 @@ function draw(){
     laserY = PlayerY;
   }
   
-  if (Health > 50 && target == true){  // L A S E R ============
+  if (Health > 175 && target == true){  // L A S E R ============
     rect(0,laserY,20,80);
     rect(1180,laserY,20,80);
     
     if (laserTime >= 15){
       tracking = false;
       if (laserTime >= 17){
+        LaserHit = true;
         stroke(255,255,0);
         strokeWeight(5);
         rect(-5,laserY,1200,80);
@@ -165,6 +159,7 @@ function draw(){
           tracking = true;
           ChargeSound = false;
           LaserSound = false;
+          LaserHit = false;
         }
       }
     }
@@ -252,8 +247,7 @@ function draw(){
       noLoop();
     }
     // Player Dead LASER XXXXXXXXXXXXXXXXXXXXX
-    if ((PlayerX > 0 && PlayerX < 20 && PlayerY > laserY && PlayerY < laserY + 80) ||
-    (PlayerX > 1180 && PlayerX < 1200 && PlayerY > laserY && PlayerY < laserY + 80)) {
+    if (PlayerY > laserY && PlayerY < laserY + 80 && LaserHit == true) {
       console.log("Player hit by laser!");
       image(boom, PlayerX, PlayerY, 100, 100);
       PlayerDead.play();
@@ -304,6 +298,9 @@ function draw(){
   }
   if (Health > 250){
     maxSpeed = 12;
+  }
+  if (Health > 450){
+    maxSpeed = 15;
   }
   mouseMove();
   
